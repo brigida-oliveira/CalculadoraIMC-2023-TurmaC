@@ -5,10 +5,12 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.SeekBar
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.nnt.calculadoraimc_turmac.databinding.ActivityTmbactivityBinding
 import com.nnt.calculadoraimc_turmac.databinding.DialogTmbInfoBinding
 import com.nnt.calculadoraimc_turmac.databinding.DialogTmbResultBinding
+import com.nnt.calculadoraimc_turmac.model.Calculo
 import java.text.DecimalFormat
 
 class TMBActivity : AppCompatActivity() {
@@ -101,6 +103,19 @@ class TMBActivity : AppCompatActivity() {
         dialogBinding.botaoVoltar.setOnClickListener {
             alertDialog.dismiss()
         }
+
+        dialogBinding.botaoGravar.setOnClickListener {
+            Thread {
+                val app = application as App
+                val dao = app.db.calculoDao()
+                dao.inserir(Calculo(tipo = "tmb", resultado = tmb))
+
+                runOnUiThread{
+                    Toast.makeText(this@TMBActivity, "Registro salvo  om sucesso!", Toast.LENGTH_LONG).show()
+                }
+            }.start()
+        }
+
         alertDialog = builder.create()
         alertDialog.show()
     }
