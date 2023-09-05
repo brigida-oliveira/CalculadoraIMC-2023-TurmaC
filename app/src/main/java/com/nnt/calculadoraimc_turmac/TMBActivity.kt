@@ -4,6 +4,8 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -100,24 +102,42 @@ class TMBActivity : AppCompatActivity() {
         val dialogBinding: DialogTmbResultBinding = DialogTmbResultBinding.inflate(LayoutInflater.from(this))
         builder.setView(dialogBinding.root)
         dialogBinding.textViewResultadoTMB.text = tmb.toString()
-        dialogBinding.botaoVoltar.setOnClickListener {
-            alertDialog.dismiss()
-        }
 
         dialogBinding.botaoGravar.setOnClickListener {
             Thread {
                 val app = application as App
                 val dao = app.db.calculoDao()
-                dao.inserir(Calculo(tipo = "tmb", resultado = tmb))
 
+                val atualizarId = intent.extras?.getInt("atualizarId")
+
+                if (atualizarId != null) {
+                    dao.atualizar(Calculo(id = atualizarId, tipo = "tmb", resultado = tmb))
+                } else {
+                    dao.inserir(Calculo(tipo = "tmb", resultado = tmb))
+                }
                 runOnUiThread{
-                    Toast.makeText(this@TMBActivity, "Registro salvo  om sucesso!", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@TMBActivity, "Registro salvo ou atualizado com sucesso!", Toast.LENGTH_LONG).show()
                 }
             }.start()
+            alertDialog.dismiss()
         }
 
         alertDialog = builder.create()
         alertDialog.show()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if(item.itemId == R.id.menu_mostrar_registros) {
+            val intent = Intent(this@TMBActivity, ListaDeCalculosActivity::class.java)
+            intent.putExtra("tipo", "tmb")
+            startActivity(intent)
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun infoTMB() {

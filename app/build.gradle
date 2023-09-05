@@ -32,7 +32,7 @@ android {
         jvmTarget = '17'
     }
     viewBinding {
-        enabled = true
+        enabled true
     }
 }
 
